@@ -1,0 +1,2143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="format-detection" content="telephone=no">
+<meta name="color-scheme" content="light">
+<title>アクセス解析レポート作成プログラム DEMO</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+//ローディング表示
+$(function() {
+    $('#loader').css('display','flex');
+});
+$(window).on('load', function(){
+    $('#loader').delay(600).fadeOut(300);
+});
+//10秒たったら強制的にロード画面を非表示
+$(function(){
+    setTimeout('stopload()',10000);
+});
+function stopload(){
+    $('#loader').delay(600).fadeOut(300);
+}
+</script>
+</head>
+
+<body>
+<aside id="toolbar">
+    <div id="loader">
+        <i class="fas fa-circle-notch"></i>
+    </div>
+<h1>アクセス解析レポート作成プログラム DEMO</h1>   <a href="#" title="設定"><i class="fas fa-cog" aria-label="設定"></i></a>
+<form method="get">
+    <label for="view">ビュー：</label>
+    <select name="view" id="view" required>
+        <option value="" disabled>-- ビューを選択してください --</option><optgroup label="group01">
+<option value="000000000_in_day01">デモサイト</option>
+</optgroup>
+    </select>
+    <label for="startDate">期間の開始日：</label><input type="date" name="startDate" id="startDate" placeholder="YYYY-MM-DD" value="2022-06-01" required>
+<label for="endDate">期間の終了日：</label>
+<input type="date" name="endDate" id="endDate" placeholder="YYYY-MM-DD" value="2022-06-30" required>
+    <input type="submit" value="適用">
+</form></aside>
+
+<header>
+    <div class="inner">
+        <section>
+            <h1>Webサイト<br>アクセス解析レポート</h1>
+    <h2>デモサイト 御中</h2>
+    <p>https://www.example.com/</p>        </section>
+        <img src="user/images/logo.svg" alt="シューゴマツザワ株式会社" width="250" height="15">    </div>
+    <small>Copyright &copy; 2022 Shugo Matsuzawa. All Rights Reserved.</small>
+</header><main class="home">
+<section id="toc">
+    <div class="title">
+        <h2>アクセス解析 レポート（目次）</h2>
+<p>デモサイト</p>    </div>
+    <p>1ヶ月間に御社のWebサイトを閲覧したユーザー数・行動などをレポートしたものです。レポートの掲載内容は下記のとおりです。</p>
+    <section>
+        <h3>1.ユーザーサマリー</h3>
+        <p>サイトアクセスの全体像です。</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>表示項目</th>
+                    <th>内容</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>セッション・ユーザー</td>
+                    <td>サイトに訪れた回数・人数</td>
+                </tr>
+                <tr>
+                    <td>ページビュー数</td>
+                    <td>総表示ページ数</td>
+                </tr>
+                <tr>
+                    <td>ページ/セッション</td>
+                    <td>サイトに訪れた方が見た平均ページ数</td>
+                </tr>
+                <tr>
+                    <td>平均セッション時間</td>
+                    <td>サイトに訪れた方の平均滞在時間</td>
+                </tr>
+                <tr>
+                    <td>直帰率</td>
+                    <td>最初の1ページを見てサイトを離れた割合（新規客）</td>
+                </tr>
+                <tr>
+                    <td>オペレーティングシステム</td>
+                    <td>パソコン端末または、モバイル端末からの閲覧</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <section>
+        <h3>2.検索クエリ</h3>
+        <p>ユーザーが Google で検索したクエリ文字列（キーワード）の検索結果の一覧です。</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>表示項目</th>
+                    <th>内容</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>検索クエリ</td>
+                    <td>検索で当サイトが表示された時のキーワード</td>
+                </tr>
+                <tr>
+                    <td>クリック数</td>
+                    <td>検索クエリで表示され、クリックされた回数</td>
+                </tr>
+                <tr>
+                    <td>表示回数</td>
+                    <td>検索クエリで表示された回数</td>
+                </tr>
+                <tr>
+                    <td>クリック率</td>
+                    <td>表示回数に対するクリック数の割合</td>
+                </tr>
+                <tr>
+                    <td>平均掲載順位</td>
+                    <td>検索クエリで表示された平均掲載順位</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <section>
+        <h3>3.検索キーワード</h3>
+        <p>当サイトのアクセスにおいて、参照元（検索エンジン、ブックマーク、SNS、参照サイト等）で使われたキーワードの一覧です。</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>表示項目</th>
+                    <th>内容</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>新規ユーザー</td>
+                    <td>新規に訪れた方の人数</td>
+                </tr>
+                <tr>
+                    <td>セッション</td>
+                    <td>サイトに訪れた回数</td>
+                </tr>
+                <tr>
+                    <td>直帰率</td>
+                    <td>最初の1ページだけ見てサイトを離た割合（新規客）</td>
+                </tr>
+                <tr>
+                    <td>ページ/セッション</td>
+                    <td>サイトに訪れた方が見た平均ページ数</td>
+                </tr>
+                <tr>
+                    <td>平均セッション時間</td>
+                    <td>サイトに訪れた方の平均滞在時間</td>
+                </tr>
+                <tr>
+                    <td>コンバージョン※</td>
+                    <td>ユーザの重要な操作が完了すること。例）サイト訪問→購入申し込み</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>※コンバージョンデータを表示するためには、あらかじめ目標を設定することが必要です。</p>
+    </section>
+    <section>
+        <h3>4.参照ページ</h3>
+        <p>ページ毎のアクセス数の概要です。</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>表示項目</th>
+                    <th>内容</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ページビュー数</td>
+                    <td>総表示ページ数</td>
+                </tr>
+                <tr>
+                    <td>ページ別訪問数</td>
+                    <td>当該ページに訪れた人数</td>
+                </tr>
+                <tr>
+                    <td>平均ページ滞在時間</td>
+                    <td>当該ページに訪れた方の平均滞在時間</td>
+                </tr>
+                <tr>
+                    <td>閲覧開始数</td>
+                    <td>当該ページに外部サイトから入ってきた数</td>
+                </tr>
+                <tr>
+                    <td>直帰率</td>
+                    <td>当該ページから入って他のページを見ないで離脱</td>
+                </tr>
+                <tr>
+                    <td>離脱率</td>
+                    <td>複数ページを見て当該ページで最後に離脱した割合</td>
+                </tr>
+                <tr>
+                    <td>ページの価値</td>
+                    <td>販売サイトの場合の売上成果</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <section class="page-break">
+        <h3>5.参照元サイト</h3>
+        <p>当サイトへの流入元、たとえば検索エンジン（Google など）やドメイン（example.com）の一覧です。</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>レポート内の表記例</th>
+                    <th>内容</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>google, yahoo</td>
+                    <td>Google、Yahooを利用した通常検索による流入</td>
+                </tr>
+                <tr>
+                    <td>(direct)</td>
+                    <td>ユーザーがブラウザに直接 URL を入力した場合や、ブックマーク経由での流入</td>
+                </tr>
+                <tr>
+                    <td>***.com</td>
+                    <td>当サイトを参照しているドメイン（サイト）***.com からの流入</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <section>
+        <h3>6.地域/ユーザー分布</h3>
+        <p>どの地域からのアクセスが多いかを表示しています。</p>
+    </section>
+    <aside>
+        <h3><i class="far fa-question-circle" aria-hidden="true"></i>&nbsp;レポート内の英文表記 (not provided) (not set) について</h3>
+        <dl>
+            <dt>(not provided)</dt>
+            <dd>「3.検索キーワード」のレポートに現れます。GoogleやYahoo等の検索エンジンがHTTPS（SSL通信）で暗号化され、検索キーワードが取れないためです。 尚、「2.検索クエリ」レポートは、検索解析専用のGoogle Search Consoleと連携しているので、Google検索のデータのみですが、ユーザの検索キーワードの傾向を確認することができます。</dd>
+            <dt>(not set)</dt>
+            <dd>リダイレクトによって参照元の情報が取得できなかった等、Googleアナリティクスの各レポート上の項目が何らかの事情によりデータを取得できなかった時に表示されます。従って、検索キーワードに限らず、各レポートのどの項目も(not set)となる可能性があります。</dd>
+        </dl>
+    </aside>
+</section><section id="visitors">
+    <div class="title">
+        <h2>1. ユーザーサマリー</h2>
+<p>デモサイト</p>    </div>
+<p><time datetime="2022-06-01">2022/06/01</time> - <time datetime="2022-06-30">2022/06/30</time></p><section class="mainChart">
+    <canvas id="visitorsChart"></canvas>
+    <script>
+    var ctx = document.getElementById("visitorsChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["6\u67081\u65e5","6\u67082\u65e5","6\u67083\u65e5","6\u67084\u65e5","6\u67085\u65e5","6\u67086\u65e5","6\u67087\u65e5","6\u67088\u65e5","6\u67089\u65e5","6\u670810\u65e5","6\u670811\u65e5","6\u670812\u65e5","6\u670813\u65e5","6\u670814\u65e5","6\u670815\u65e5","6\u670816\u65e5","6\u670817\u65e5","6\u670818\u65e5","6\u670819\u65e5","6\u670820\u65e5","6\u670821\u65e5","6\u670822\u65e5","6\u670823\u65e5","6\u670824\u65e5","6\u670825\u65e5","6\u670826\u65e5","6\u670827\u65e5","6\u670828\u65e5","6\u670829\u65e5","6\u670830\u65e5"],
+            datasets: [
+                {
+                    label: 'ユーザー',
+                    data: ["115","148","123","131","126","152","134","140","133","139","171","123","136","134","281","168","139","107","114","123","127","141","141","125","87","119","174","447","129","115"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc7",
+                    pointBackgroundColor: "#068dc7"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                align: 'start'
+            }
+        }
+    });
+    </script>
+</section>    <section class="summaryChart">
+        <section class="miniChart">
+<section>
+    <h3>ユーザー</h3>
+    <p>4,442</p>    <div class="miniChartWrapper">
+        <canvas id="visitorsUsersChart"></canvas>
+    </div>
+    <script>
+    var ctx = document.getElementById("visitorsUsersChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["20220601","20220602","20220603","20220604","20220605","20220606","20220607","20220608","20220609","20220610","20220611","20220612","20220613","20220614","20220615","20220616","20220617","20220618","20220619","20220620","20220621","20220622","20220623","20220624","20220625","20220626","20220627","20220628","20220629","20220630"],
+            datasets: [
+                {
+                    label: 'ユーザー',
+                    data: ["115","148","123","131","126","152","134","140","133","139","171","123","136","134","281","168","139","107","114","123","127","141","141","125","87","119","174","447","129","115"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc700",
+                    pointBackgroundColor: "#068dc700"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            tooltips: {
+                enabled: false
+            },
+            scales: {
+                yAxes: [{
+                    display: false
+                }],
+                xAxes: [{
+                    display: false
+                }]
+            }
+        }
+    });
+    </script>
+</section><section>
+    <h3>新規ユーザー</h3>
+    <p>3,835</p>    <div class="miniChartWrapper">
+        <canvas id="visitorsNewUsersChart"></canvas>
+    </div>
+    <script>
+    var ctx = document.getElementById("visitorsNewUsersChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["20220601","20220602","20220603","20220604","20220605","20220606","20220607","20220608","20220609","20220610","20220611","20220612","20220613","20220614","20220615","20220616","20220617","20220618","20220619","20220620","20220621","20220622","20220623","20220624","20220625","20220626","20220627","20220628","20220629","20220630"],
+            datasets: [
+                {
+                    label: '新規ユーザー',
+                    data: ["96","121","107","122","108","128","107","124","107","120","162","115","109","112","252","143","117","89","90","100","96","120","122","108","75","110","150","414","107","104"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc700",
+                    pointBackgroundColor: "#068dc700"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            tooltips: {
+                enabled: false
+            },
+            scales: {
+                yAxes: [{
+                    display: false
+                }],
+                xAxes: [{
+                    display: false
+                }]
+            }
+        }
+    });
+    </script>
+</section><section>
+    <h3>セッション</h3>
+    <p>4,912</p>    <div class="miniChartWrapper">
+        <canvas id="visitorsSessionsChart"></canvas>
+    </div>
+    <script>
+    var ctx = document.getElementById("visitorsSessionsChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["20220601","20220602","20220603","20220604","20220605","20220606","20220607","20220608","20220609","20220610","20220611","20220612","20220613","20220614","20220615","20220616","20220617","20220618","20220619","20220620","20220621","20220622","20220623","20220624","20220625","20220626","20220627","20220628","20220629","20220630"],
+            datasets: [
+                {
+                    label: 'セッション',
+                    data: ["125","167","132","147","142","171","147","154","141","160","187","127","151","145","303","187","153","124","117","140","149","153","152","142","102","128","205","480","156","125"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc700",
+                    pointBackgroundColor: "#068dc700"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            tooltips: {
+                enabled: false
+            },
+            scales: {
+                yAxes: [{
+                    display: false
+                }],
+                xAxes: [{
+                    display: false
+                }]
+            }
+        }
+    });
+    </script>
+</section><section>
+    <h3>ユーザーあたりのセッション数</h3>
+    <p>1.11</p>    <div class="miniChartWrapper">
+        <canvas id="visitorsSessionsPerUserChart"></canvas>
+    </div>
+    <script>
+    var ctx = document.getElementById("visitorsSessionsPerUserChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["20220601","20220602","20220603","20220604","20220605","20220606","20220607","20220608","20220609","20220610","20220611","20220612","20220613","20220614","20220615","20220616","20220617","20220618","20220619","20220620","20220621","20220622","20220623","20220624","20220625","20220626","20220627","20220628","20220629","20220630"],
+            datasets: [
+                {
+                    label: 'ユーザーあたりのセッション数',
+                    data: ["1.0869565217391304","1.1283783783783783","1.0731707317073171","1.1221374045801527","1.126984126984127","1.125","1.0970149253731343","1.1","1.0601503759398496","1.1510791366906474","1.0935672514619883","1.032520325203252","1.1102941176470589","1.0820895522388059","1.0782918149466192","1.1130952380952381","1.1007194244604317","1.158878504672897","1.0263157894736843","1.1382113821138211","1.1732283464566928","1.0851063829787233","1.0780141843971631","1.136","1.1724137931034482","1.0756302521008403","1.1781609195402298","1.0738255033557047","1.2093023255813953","1.0869565217391304"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc700",
+                    pointBackgroundColor: "#068dc700"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            tooltips: {
+                enabled: false
+            },
+            scales: {
+                yAxes: [{
+                    display: false
+                }],
+                xAxes: [{
+                    display: false
+                }]
+            }
+        }
+    });
+    </script>
+</section><section>
+    <h3>ページビュー数</h3>
+    <p>10,809</p>    <div class="miniChartWrapper">
+        <canvas id="visitorsPageviewsChart"></canvas>
+    </div>
+    <script>
+    var ctx = document.getElementById("visitorsPageviewsChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["20220601","20220602","20220603","20220604","20220605","20220606","20220607","20220608","20220609","20220610","20220611","20220612","20220613","20220614","20220615","20220616","20220617","20220618","20220619","20220620","20220621","20220622","20220623","20220624","20220625","20220626","20220627","20220628","20220629","20220630"],
+            datasets: [
+                {
+                    label: 'ページビュー数',
+                    data: ["300","381","353","376","331","392","252","351","324","429","339","229","596","347","616","426","304","205","228","296","364","412","307","246","211","237","466","834","354","303"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc700",
+                    pointBackgroundColor: "#068dc700"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            tooltips: {
+                enabled: false
+            },
+            scales: {
+                yAxes: [{
+                    display: false
+                }],
+                xAxes: [{
+                    display: false
+                }]
+            }
+        }
+    });
+    </script>
+</section><section>
+    <h3>ページ/セッション</h3>
+    <p>2.2</p>    <div class="miniChartWrapper">
+        <canvas id="visitorsPageviewsPerSessionChart"></canvas>
+    </div>
+    <script>
+    var ctx = document.getElementById("visitorsPageviewsPerSessionChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["20220601","20220602","20220603","20220604","20220605","20220606","20220607","20220608","20220609","20220610","20220611","20220612","20220613","20220614","20220615","20220616","20220617","20220618","20220619","20220620","20220621","20220622","20220623","20220624","20220625","20220626","20220627","20220628","20220629","20220630"],
+            datasets: [
+                {
+                    label: 'ページ/セッション',
+                    data: ["2.4","2.281437125748503","2.6742424242424243","2.557823129251701","2.3309859154929575","2.2923976608187133","1.7142857142857142","2.279220779220779","2.297872340425532","2.68125","1.8128342245989304","1.8031496062992125","3.947019867549669","2.393103448275862","2.033003300330033","2.27807486631016","1.9869281045751634","1.653225806451613","1.9487179487179487","2.1142857142857143","2.442953020134228","2.69281045751634","2.0197368421052633","1.732394366197183","2.0686274509803924","1.8515625","2.273170731707317","1.7375","2.269230769230769","2.424"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc700",
+                    pointBackgroundColor: "#068dc700"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            tooltips: {
+                enabled: false
+            },
+            scales: {
+                yAxes: [{
+                    display: false
+                }],
+                xAxes: [{
+                    display: false
+                }]
+            }
+        }
+    });
+    </script>
+</section><section>
+    <h3>平均セッション時間</h3>
+    <p>00:01:39</p>    <div class="miniChartWrapper">
+        <canvas id="visitorsAvgSessionDurationChart"></canvas>
+    </div>
+    <script>
+    var ctx = document.getElementById("visitorsAvgSessionDurationChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["20220601","20220602","20220603","20220604","20220605","20220606","20220607","20220608","20220609","20220610","20220611","20220612","20220613","20220614","20220615","20220616","20220617","20220618","20220619","20220620","20220621","20220622","20220623","20220624","20220625","20220626","20220627","20220628","20220629","20220630"],
+            datasets: [
+                {
+                    label: '平均セッション時間',
+                    data: ["97.6","105.32335329341318","136.96969696969697","98.27210884353741","126.44366197183099","143.40350877192984","59.14965986394558","107.18831168831169","104.69503546099291","184.61875","43.481283422459896","110.80314960629921","135.52980132450332","89.70344827586207","89.73597359735973","160.97860962566844","59.111111111111114","45.78225806451613","68.76068376068376","72.74285714285715","166.0","98.48366013071896","92.57894736842105","83.74647887323944","65.05882352941177","69.2734375","118.04878048780488","54.702083333333334","169.28846153846155","101.776"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc700",
+                    pointBackgroundColor: "#068dc700"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            tooltips: {
+                enabled: false
+            },
+            scales: {
+                yAxes: [{
+                    display: false
+                }],
+                xAxes: [{
+                    display: false
+                }]
+            }
+        }
+    });
+    </script>
+</section><section>
+    <h3>直帰率</h3>
+    <p>68.93%</p>    <div class="miniChartWrapper">
+        <canvas id="visitorsBounceRateChart"></canvas>
+    </div>
+    <script>
+    var ctx = document.getElementById("visitorsBounceRateChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["20220601","20220602","20220603","20220604","20220605","20220606","20220607","20220608","20220609","20220610","20220611","20220612","20220613","20220614","20220615","20220616","20220617","20220618","20220619","20220620","20220621","20220622","20220623","20220624","20220625","20220626","20220627","20220628","20220629","20220630"],
+            datasets: [
+                {
+                    label: '直帰率',
+                    data: ["62.4","61.07784431137725","62.878787878787875","68.02721088435374","66.90140845070422","64.32748538011695","72.10884353741497","69.48051948051948","60.28368794326241","61.875","80.21390374331551","65.35433070866141","64.90066225165563","66.89655172413794","74.25742574257426","63.63636363636363","68.62745098039215","76.61290322580645","73.50427350427351","66.42857142857143","55.033557046979865","61.43790849673203","70.39473684210526","71.12676056338029","66.66666666666666","71.875","66.34146341463415","83.75","66.66666666666666","67.2"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc700",
+                    pointBackgroundColor: "#068dc700"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            tooltips: {
+                enabled: false
+            },
+            scales: {
+                yAxes: [{
+                    display: false
+                }],
+                xAxes: [{
+                    display: false
+                }]
+            }
+        }
+    });
+    </script>
+</section>        </section>
+<section>
+    <canvas id="visitorsUserTypeChart"></canvas>
+    <script>
+    var ctx = document.getElementById("visitorsUserTypeChart");
+    var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ["New Visitor","Returning Visitor"],
+            datasets: [
+                {
+                    data: [87.99081515499427,12.009184845005741],
+                    backgroundColor: ["#058dc7", "#50b432"]
+                }
+            ]
+        },
+        options: {
+            aspectRatio: 1
+        }
+    });
+    </script>
+</section>    </section>
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>オペレーティングシステム</th>
+            <th>ユーザー</th>
+            <th>ユーザー（%）</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+    <td class="rank">1</td>
+    <td>iOS</td>
+    <td>1,342</td>
+    <td style="background: linear-gradient(to right, #068dc722 33.608815426997%, #fff 33.608815426997%);">33.61%</td>
+</tr><tr>
+    <td class="rank">2</td>
+    <td>Windows</td>
+    <td>1,194</td>
+    <td style="background: linear-gradient(to right, #068dc722 29.902329075883%, #fff 29.902329075883%);">29.9%</td>
+</tr><tr>
+    <td class="rank">3</td>
+    <td>Android</td>
+    <td>1,037</td>
+    <td style="background: linear-gradient(to right, #068dc722 25.970448284498%, #fff 25.970448284498%);">25.97%</td>
+</tr><tr>
+    <td class="rank">4</td>
+    <td>Macintosh</td>
+    <td>234</td>
+    <td style="background: linear-gradient(to right, #068dc722 5.8602554470323%, #fff 5.8602554470323%);">5.86%</td>
+</tr><tr>
+    <td class="rank">5</td>
+    <td>Linux</td>
+    <td>86</td>
+    <td style="background: linear-gradient(to right, #068dc722 2.1537690959179%, #fff 2.1537690959179%);">2.15%</td>
+</tr><tr>
+    <td class="rank">6</td>
+    <td>(not set)</td>
+    <td>64</td>
+    <td style="background: linear-gradient(to right, #068dc722 1.60280490859%, #fff 1.60280490859%);">1.6%</td>
+</tr><tr>
+    <td class="rank">7</td>
+    <td>Chrome OS</td>
+    <td>36</td>
+    <td style="background: linear-gradient(to right, #068dc722 0.90157776108189%, #fff 0.90157776108189%);">0.9%</td>
+</tr></tbody></table></section><section id="queries">
+    <div class="title">
+        <h2>2. 検索クエリ</h2>
+<p>デモサイト</p>    </div>
+    <p>Google検索：上位1,000件のランディングページ（日別）</p>
+<p><time datetime="2022-06-01">2022/06/01</time> - <time datetime="2022-06-30">2022/06/30</time></p><section class="mainChart">
+    <canvas id="queryChart"></canvas>
+    <script>
+    var ctx = document.getElementById("queryChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["6\u67081\u65e5","6\u67082\u65e5","6\u67083\u65e5","6\u67084\u65e5","6\u67085\u65e5","6\u67086\u65e5","6\u67087\u65e5","6\u67088\u65e5","6\u67089\u65e5","6\u670810\u65e5","6\u670811\u65e5","6\u670812\u65e5","6\u670813\u65e5","6\u670814\u65e5","6\u670815\u65e5","6\u670816\u65e5","6\u670817\u65e5","6\u670818\u65e5","6\u670819\u65e5","6\u670820\u65e5","6\u670821\u65e5","6\u670822\u65e5","6\u670823\u65e5","6\u670824\u65e5","6\u670825\u65e5","6\u670826\u65e5","6\u670827\u65e5","6\u670828\u65e5","6\u670829\u65e5","6\u670830\u65e5"],
+            datasets: [
+                {
+                    label: 'クリック数',
+                    data: [82,69,62,73,64,103,75,90,85,64,64,95,67,63,73,63,64,59,79,79,78,89,77,48,54,107,79,71,71,69],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc7",
+                    pointBackgroundColor: "#068dc7"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                align: 'start'
+            }
+        }
+    });
+    </script>
+</section><table>
+    <colgroup>
+        <col span="2">
+        <col class="active">
+        <col span="3">
+    </colgroup>
+    <thead>
+        <tr>
+            <th colspan="2">検索クエリ</th>
+            <th>クリック数</th>
+            <th>表示回数</th>
+            <th>クリック率</th>
+            <th>平均掲載順位</th>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td>856<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(856)</span></td>
+            <td>31,910<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(31,910)</span></td>
+            <td>0.01%<br><span class="small">ビューの<wbr>平均：<br>0.01%<br>(0%)</span></td>
+            <td>49.56<br><span class="small">ビューの<wbr>平均：<br>49.56<br>(0%)</span></td>
+        </tr>
+    </thead>
+    <tbody><tr>
+    <td class="rank">1</td>
+    <td class="title-col">デモサイト</td>
+    <td>255<br><span class="small">(29.79%)</span></td>
+    <td>474<br><span class="small">(1.49%)</span></td>
+    <td>0.54%</td>
+    <td>1.38</td>
+</tr><tr>
+    <td class="rank">2</td>
+    <td class="title-col">○○○○</td>
+    <td>133<br><span class="small">(15.54%)</span></td>
+    <td>1,002<br><span class="small">(3.14%)</span></td>
+    <td>0.13%</td>
+    <td>3.53</td>
+</tr><tr>
+    <td class="rank">3</td>
+    <td class="title-col">○○○○ ○○</td>
+    <td>34<br><span class="small">(3.97%)</span></td>
+    <td>1,006<br><span class="small">(3.15%)</span></td>
+    <td>0.03%</td>
+    <td>4.51</td>
+</tr><tr>
+    <td class="rank">4</td>
+    <td class="title-col">○○○○ ○○</td>
+    <td>34<br><span class="small">(3.97%)</span></td>
+    <td>81<br><span class="small">(0.25%)</span></td>
+    <td>0.42%</td>
+    <td>1.88</td>
+</tr><tr>
+    <td class="rank">5</td>
+    <td class="title-col">○○○○ ○○○○○○○○</td>
+    <td>30<br><span class="small">(3.5%)</span></td>
+    <td>475<br><span class="small">(1.49%)</span></td>
+    <td>0.06%</td>
+    <td>8.04</td>
+</tr><tr>
+    <td class="rank">6</td>
+    <td class="title-col">○○○○ ○○○○</td>
+    <td>27<br><span class="small">(3.15%)</span></td>
+    <td>94<br><span class="small">(0.29%)</span></td>
+    <td>0.29%</td>
+    <td>3.33</td>
+</tr><tr>
+    <td class="rank">7</td>
+    <td class="title-col">○○○○○○○○○○○○</td>
+    <td>19<br><span class="small">(2.22%)</span></td>
+    <td>26<br><span class="small">(0.08%)</span></td>
+    <td>0.73%</td>
+    <td>1</td>
+</tr><tr>
+    <td class="rank">8</td>
+    <td class="title-col">○○○○</td>
+    <td>16<br><span class="small">(1.87%)</span></td>
+    <td>71<br><span class="small">(0.22%)</span></td>
+    <td>0.23%</td>
+    <td>2.04</td>
+</tr><tr>
+    <td class="rank">9</td>
+    <td class="title-col">○○○○○○○○○○</td>
+    <td>15<br><span class="small">(1.75%)</span></td>
+    <td>161<br><span class="small">(0.5%)</span></td>
+    <td>0.09%</td>
+    <td>7.81</td>
+</tr><tr>
+    <td class="rank">10</td>
+    <td class="title-col">○○○○○○○○○○</td>
+    <td>15<br><span class="small">(1.75%)</span></td>
+    <td>20<br><span class="small">(0.06%)</span></td>
+    <td>0.75%</td>
+    <td>1</td>
+</tr><tr>
+    <td class="rank">11</td>
+    <td class="title-col">○○○○ ○○○○</td>
+    <td>9<br><span class="small">(1.05%)</span></td>
+    <td>23<br><span class="small">(0.07%)</span></td>
+    <td>0.39%</td>
+    <td>1</td>
+</tr><tr>
+    <td class="rank">12</td>
+    <td class="title-col">○○○○○○○○</td>
+    <td>8<br><span class="small">(0.93%)</span></td>
+    <td>36<br><span class="small">(0.11%)</span></td>
+    <td>0.22%</td>
+    <td>2.36</td>
+</tr><tr>
+    <td class="rank">13</td>
+    <td class="title-col">○○ ○○○○</td>
+    <td>8<br><span class="small">(0.93%)</span></td>
+    <td>43<br><span class="small">(0.13%)</span></td>
+    <td>0.19%</td>
+    <td>2.88</td>
+</tr><tr>
+    <td class="rank">14</td>
+    <td class="title-col">○○○○ ○○</td>
+    <td>8<br><span class="small">(0.93%)</span></td>
+    <td>217<br><span class="small">(0.68%)</span></td>
+    <td>0.04%</td>
+    <td>8.17</td>
+</tr><tr>
+    <td class="rank">15</td>
+    <td class="title-col">○○○○ ○○○○</td>
+    <td>8<br><span class="small">(0.93%)</span></td>
+    <td>30<br><span class="small">(0.09%)</span></td>
+    <td>0.27%</td>
+    <td>9.53</td>
+</tr><tr>
+    <td class="rank">16</td>
+    <td class="title-col">○○○○ ○○○○</td>
+    <td>7<br><span class="small">(0.82%)</span></td>
+    <td>42<br><span class="small">(0.13%)</span></td>
+    <td>0.17%</td>
+    <td>3.1</td>
+</tr><tr>
+    <td class="rank">17</td>
+    <td class="title-col">○○○○ ○○○○○○</td>
+    <td>7<br><span class="small">(0.82%)</span></td>
+    <td>65<br><span class="small">(0.2%)</span></td>
+    <td>0.11%</td>
+    <td>2.8</td>
+</tr><tr>
+    <td class="rank">18</td>
+    <td class="title-col">○○○○○○○○○○</td>
+    <td>7<br><span class="small">(0.82%)</span></td>
+    <td>67<br><span class="small">(0.21%)</span></td>
+    <td>0.1%</td>
+    <td>2.88</td>
+</tr><tr>
+    <td class="rank">19</td>
+    <td class="title-col">○○○○○○</td>
+    <td>6<br><span class="small">(0.7%)</span></td>
+    <td>815<br><span class="small">(2.55%)</span></td>
+    <td>0.01%</td>
+    <td>10.03</td>
+</tr><tr>
+    <td class="rank">20</td>
+    <td class="title-col">○○○○ ○○○○</td>
+    <td>6<br><span class="small">(0.7%)</span></td>
+    <td>39<br><span class="small">(0.12%)</span></td>
+    <td>0.15%</td>
+    <td>5.72</td>
+</tr><tr>
+    <td class="rank">21</td>
+    <td class="title-col">○○○○ ○○ ○○ ○○○○</td>
+    <td>6<br><span class="small">(0.7%)</span></td>
+    <td>18<br><span class="small">(0.06%)</span></td>
+    <td>0.33%</td>
+    <td>3.83</td>
+</tr><tr>
+    <td class="rank">22</td>
+    <td class="title-col">○○ ○○○○○○ ○○○○</td>
+    <td>6<br><span class="small">(0.7%)</span></td>
+    <td>216<br><span class="small">(0.68%)</span></td>
+    <td>0.03%</td>
+    <td>4.62</td>
+</tr><tr>
+    <td class="rank">23</td>
+    <td class="title-col">○○○○</td>
+    <td>5<br><span class="small">(0.58%)</span></td>
+    <td>1,756<br><span class="small">(5.5%)</span></td>
+    <td>0%</td>
+    <td>8.42</td>
+</tr><tr>
+    <td class="rank">24</td>
+    <td class="title-col">○○○○ ○○○○</td>
+    <td>5<br><span class="small">(0.58%)</span></td>
+    <td>182<br><span class="small">(0.57%)</span></td>
+    <td>0.03%</td>
+    <td>7.66</td>
+</tr><tr>
+    <td class="rank">25</td>
+    <td class="title-col">○○○○○○</td>
+    <td>5<br><span class="small">(0.58%)</span></td>
+    <td>19<br><span class="small">(0.06%)</span></td>
+    <td>0.26%</td>
+    <td>1</td>
+</tr></tbody></table></section><section id="organic">
+    <div class="title">
+<h2>3. 検索キーワード</h2><p>デモサイト</p>    </div>
+<p><time datetime="2022-06-01">2022/06/01</time> - <time datetime="2022-06-30">2022/06/30</time></p><section class="mainChart">
+    <canvas id="organicUsersChart"></canvas>
+    <script>
+    var ctx = document.getElementById("organicUsersChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["6\u67081\u65e5","6\u67082\u65e5","6\u67083\u65e5","6\u67084\u65e5","6\u67085\u65e5","6\u67086\u65e5","6\u67087\u65e5","6\u67088\u65e5","6\u67089\u65e5","6\u670810\u65e5","6\u670811\u65e5","6\u670812\u65e5","6\u670813\u65e5","6\u670814\u65e5","6\u670815\u65e5","6\u670816\u65e5","6\u670817\u65e5","6\u670818\u65e5","6\u670819\u65e5","6\u670820\u65e5","6\u670821\u65e5","6\u670822\u65e5","6\u670823\u65e5","6\u670824\u65e5","6\u670825\u65e5","6\u670826\u65e5","6\u670827\u65e5","6\u670828\u65e5","6\u670829\u65e5","6\u670830\u65e5"],
+            datasets: [
+                {
+                    label: 'ユーザー',
+                    data: ["115","148","123","131","126","152","134","140","133","139","171","123","136","134","281","168","139","107","114","123","127","141","141","125","87","119","174","447","129","115"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc7",
+                    pointBackgroundColor: "#068dc7"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                align: 'start'
+            }
+        }
+    });
+    </script>
+</section><table>
+    <colgroup>
+        <col span="2">
+        <col class="active">
+        <col span="8">
+    </colgroup>
+    <thead>
+        <tr>
+            <th colspan="2" rowspan="2">キーワード</th>
+            <th colspan="3">集客</th>
+            <th colspan="3">行動</th>
+            <th colspan="3">コンバージョン<wbr>（すべての目標）</th>
+        </tr>
+        <tr>
+            <th>ユーザー</th>
+            <th>新規<wbr>ユーザー</th>
+            <th>セッション</th>
+            <th>直帰率</th>
+            <th>ページ/<wbr>セッション</th>
+            <th>平均<wbr>セッション<wbr>時間</th>
+            <th>コンバージョン<wbr>率</th>
+            <th>目標の<wbr>完了数</th>
+            <th>目標値</th>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td>4,073<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(4,073)</span></td>
+            <td>3,835<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(3,835)</span></td>
+            <td>4,912<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(4,912)</span></td>
+            <td>68.93%<br><span class="small">ビューの<wbr>平均：<br>68.93%<br>(0%)</span></td>
+            <td>2.2<br><span class="small">ビューの<wbr>平均：<br>2.2<br>(0%)</span></td>
+            <td>00:01:39<br><span class="small">ビューの<wbr>平均：<br>00:01:39<br>(0%)</span></td>
+            <td>0%<br><span class="small">ビューの<wbr>平均：<br>0%<br>(0%)</span></td>
+            <td>0<br><span class="small">全体に<wbr>対する<wbr>割合：<br>0%<br>(0)</span></td>
+            <td>$0<br><span class="small">全体に<wbr>対する<wbr>割合：<br>0%<br>($0)</span></td>
+        </tr>
+    </thead>
+    <tbody>    <tr>
+        <td class="rank">1</td>
+        <td class="title-col">(not provided)</td>
+        <td>2,613<br><span class="small">(64.15%)</span></td>
+        <td>2,459<br><span class="small">(64.12%)</span></td>
+        <td>3,111<br><span class="small">(63.33%)</span></td>
+        <td>67.21%</td>
+        <td>2.36</td>
+        <td>00:01:47</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">2</td>
+        <td class="title-col">(not set)</td>
+        <td>1,451<br><span class="small">(35.62%)</span></td>
+        <td>1,368<br><span class="small">(35.67%)</span></td>
+        <td>1,790<br><span class="small">(36.44%)</span></td>
+        <td>71.96%</td>
+        <td>1.92</td>
+        <td>00:01:26</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">3</td>
+        <td class="title-col">デモサイト</td>
+        <td>3<br><span class="small">(0.07%)</span></td>
+        <td>2<br><span class="small">(0.05%)</span></td>
+        <td>5<br><span class="small">(0.1%)</span></td>
+        <td>20%</td>
+        <td>3</td>
+        <td>00:07:01</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">4</td>
+        <td class="title-col">○○○○ ○○</td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>1<br><span class="small">(0.03%)</span></td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">5</td>
+        <td class="title-col">○○○○○○○○○○</td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>1<br><span class="small">(0.03%)</span></td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">6</td>
+        <td class="title-col">○○○○</td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>1<br><span class="small">(0.03%)</span></td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">7</td>
+        <td class="title-col">○○○○○○○○○○</td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>1<br><span class="small">(0.03%)</span></td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">8</td>
+        <td class="title-col">○○○○○○ ○○ ○○</td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>1<br><span class="small">(0.03%)</span></td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">9</td>
+        <td class="title-col">○○○○○○○○○○</td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>1<br><span class="small">(0.03%)</span></td>
+        <td>1<br><span class="small">(0.02%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr></tbody></table></section><section id="pages">
+    <div class="title">
+<h2>4. 参照ページ</h2><p>デモサイト</p>    </div>
+<p><time datetime="2022-06-01">2022/06/01</time> - <time datetime="2022-06-30">2022/06/30</time></p><section class="mainChart">
+    <canvas id="pagesChart"></canvas>
+    <script>
+    var ctx = document.getElementById("pagesChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["6\u67081\u65e5","6\u67082\u65e5","6\u67083\u65e5","6\u67084\u65e5","6\u67085\u65e5","6\u67086\u65e5","6\u67087\u65e5","6\u67088\u65e5","6\u67089\u65e5","6\u670810\u65e5","6\u670811\u65e5","6\u670812\u65e5","6\u670813\u65e5","6\u670814\u65e5","6\u670815\u65e5","6\u670816\u65e5","6\u670817\u65e5","6\u670818\u65e5","6\u670819\u65e5","6\u670820\u65e5","6\u670821\u65e5","6\u670822\u65e5","6\u670823\u65e5","6\u670824\u65e5","6\u670825\u65e5","6\u670826\u65e5","6\u670827\u65e5","6\u670828\u65e5","6\u670829\u65e5","6\u670830\u65e5"],
+            datasets: [
+                {
+                    label: 'ページビュー数',
+                    data: ["300","381","353","376","331","392","252","351","324","429","339","229","596","347","616","426","304","205","228","296","364","412","307","246","211","237","466","834","354","303"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc7",
+                    pointBackgroundColor: "#068dc7"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                align: 'start'
+            }
+        }
+    });
+    </script>
+</section><table>
+    <colgroup>
+        <col span="2">
+        <col class="active">
+        <col span="6">
+    </colgroup>
+    <thead>
+        <tr>
+            <th colspan="2">ページ<wbr>タイトル</th>
+            <th>ページ<wbr>ビュー<wbr>数</th>
+            <th>ページ別<wbr>訪問数</th>
+            <th>平均ページ<wbr>滞在時間</th>
+            <th>閲覧<wbr>開始数</th>
+            <th>直帰率</th>
+            <th>離脱率</th>
+            <th>ページの<wbr>価値</th>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td>10,809<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(10,809)</span></td>
+            <td>8,305<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(8,305)</span></td>
+            <td>00:01:23<br><span class="small">ビューの<wbr>平均：<br>00:01:23<br>(0%)</span></td>
+            <td>4,912<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(4,912)</span></td>
+            <td>68.93%<br><span class="small">ビューの<wbr>平均：<br>68.93%<br>(0%)</span></td>
+            <td>45.44%<br><span class="small">ビューの<wbr>平均：<br>45.44%<br>(0%)</span></td>
+            <td>$0<br><span class="small">全体に<wbr>対する<wbr>割合：<br>0%<br>($0)</span></td>
+        </tr>
+    </thead>
+    <tbody>    <tr>
+        <td class="rank">1</td>
+        <td class="title-col"><a href="#" target="_blank">デモサイト</a></td>
+        <td>1,843<br><span class="small">(17.05%)</span></td>
+        <td>1,284<br><span class="small">(15.46%)</span></td>
+        <td>00:01:41</td>
+        <td>1,184<br><span class="small">(24.1%)</span></td>
+        <td>47.3%</td>
+        <td>43.41%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">2</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○ – デモサイト</a></td>
+        <td>880<br><span class="small">(8.14%)</span></td>
+        <td>723<br><span class="small">(8.71%)</span></td>
+        <td>00:04:01</td>
+        <td>621<br><span class="small">(12.64%)</span></td>
+        <td>77.78%</td>
+        <td>72.39%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">3</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○ – デモサイト</a></td>
+        <td>786<br><span class="small">(7.27%)</span></td>
+        <td>444<br><span class="small">(5.35%)</span></td>
+        <td>00:00:44</td>
+        <td>183<br><span class="small">(3.73%)</span></td>
+        <td>28.96%</td>
+        <td>18.32%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">4</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○ – デモサイト</a></td>
+        <td>348<br><span class="small">(3.22%)</span></td>
+        <td>273<br><span class="small">(3.29%)</span></td>
+        <td>00:00:57</td>
+        <td>97<br><span class="small">(1.97%)</span></td>
+        <td>62.89%</td>
+        <td>40.23%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">5</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○ – デモサイト</a></td>
+        <td>339<br><span class="small">(3.14%)</span></td>
+        <td>291<br><span class="small">(3.5%)</span></td>
+        <td>00:02:31</td>
+        <td>214<br><span class="small">(4.36%)</span></td>
+        <td>74.3%</td>
+        <td>60.77%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">6</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○○○○○○○○○○○○○ – デモサイト</a></td>
+        <td>337<br><span class="small">(3.12%)</span></td>
+        <td>325<br><span class="small">(3.91%)</span></td>
+        <td>00:02:54</td>
+        <td>317<br><span class="small">(6.45%)</span></td>
+        <td>96.53%</td>
+        <td>94.66%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">7</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○ – デモサイト</a></td>
+        <td>281<br><span class="small">(2.6%)</span></td>
+        <td>173<br><span class="small">(2.08%)</span></td>
+        <td>00:00:29</td>
+        <td>35<br><span class="small">(0.71%)</span></td>
+        <td>31.43%</td>
+        <td>14.95%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">8</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○ – デモサイト</a></td>
+        <td>266<br><span class="small">(2.46%)</span></td>
+        <td>177<br><span class="small">(2.13%)</span></td>
+        <td>00:00:20</td>
+        <td>27<br><span class="small">(0.55%)</span></td>
+        <td>48.15%</td>
+        <td>17.67%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">9</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○○○○○○○○○○○○○○○○○○○ – デモサイト</a></td>
+        <td>229<br><span class="small">(2.12%)</span></td>
+        <td>210<br><span class="small">(2.53%)</span></td>
+        <td>00:02:29</td>
+        <td>191<br><span class="small">(3.89%)</span></td>
+        <td>97.38%</td>
+        <td>86.46%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">10</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○ – デモサイト</a></td>
+        <td>198<br><span class="small">(1.83%)</span></td>
+        <td>127<br><span class="small">(1.53%)</span></td>
+        <td>00:01:56</td>
+        <td>42<br><span class="small">(0.86%)</span></td>
+        <td>71.43%</td>
+        <td>41.92%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">11</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○ – デモサイト</a></td>
+        <td>197<br><span class="small">(1.82%)</span></td>
+        <td>136<br><span class="small">(1.64%)</span></td>
+        <td>00:03:36</td>
+        <td>82<br><span class="small">(1.67%)</span></td>
+        <td>65.85%</td>
+        <td>50.76%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">12</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○ – デモサイト</a></td>
+        <td>183<br><span class="small">(1.69%)</span></td>
+        <td>152<br><span class="small">(1.83%)</span></td>
+        <td>00:01:46</td>
+        <td>17<br><span class="small">(0.35%)</span></td>
+        <td>88.24%</td>
+        <td>47.54%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">13</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○ – デモサイト</a></td>
+        <td>143<br><span class="small">(1.32%)</span></td>
+        <td>88<br><span class="small">(1.06%)</span></td>
+        <td>00:00:20</td>
+        <td>11<br><span class="small">(0.22%)</span></td>
+        <td>36.36%</td>
+        <td>9.79%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">14</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○ – デモサイト</a></td>
+        <td>132<br><span class="small">(1.22%)</span></td>
+        <td>117<br><span class="small">(1.41%)</span></td>
+        <td>00:02:32</td>
+        <td>63<br><span class="small">(1.28%)</span></td>
+        <td>84.13%</td>
+        <td>65.15%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">15</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○ – デモサイト</a></td>
+        <td>132<br><span class="small">(1.22%)</span></td>
+        <td>85<br><span class="small">(1.02%)</span></td>
+        <td>00:00:48</td>
+        <td>5<br><span class="small">(0.1%)</span></td>
+        <td>60%</td>
+        <td>13.64%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">16</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○ – デモサイト</a></td>
+        <td>128<br><span class="small">(1.18%)</span></td>
+        <td>82<br><span class="small">(0.99%)</span></td>
+        <td>00:00:39</td>
+        <td>15<br><span class="small">(0.31%)</span></td>
+        <td>33.33%</td>
+        <td>14.84%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">17</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○ – デモサイト</a></td>
+        <td>128<br><span class="small">(1.18%)</span></td>
+        <td>99<br><span class="small">(1.19%)</span></td>
+        <td>00:02:05</td>
+        <td>61<br><span class="small">(1.24%)</span></td>
+        <td>70.49%</td>
+        <td>52.34%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">18</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○ – デモサイト</a></td>
+        <td>127<br><span class="small">(1.17%)</span></td>
+        <td>112<br><span class="small">(1.35%)</span></td>
+        <td>00:01:22</td>
+        <td>58<br><span class="small">(1.18%)</span></td>
+        <td>86.21%</td>
+        <td>59.06%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">19</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○ – デモサイト</a></td>
+        <td>124<br><span class="small">(1.15%)</span></td>
+        <td>108<br><span class="small">(1.3%)</span></td>
+        <td>00:02:35</td>
+        <td>81<br><span class="small">(1.65%)</span></td>
+        <td>82.72%</td>
+        <td>71.77%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">20</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○ – デモサイト</a></td>
+        <td>112<br><span class="small">(1.04%)</span></td>
+        <td>84<br><span class="small">(1.01%)</span></td>
+        <td>00:01:48</td>
+        <td>38<br><span class="small">(0.77%)</span></td>
+        <td>73.68%</td>
+        <td>41.07%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">21</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○ – デモサイト</a></td>
+        <td>111<br><span class="small">(1.03%)</span></td>
+        <td>96<br><span class="small">(1.16%)</span></td>
+        <td>00:01:30</td>
+        <td>52<br><span class="small">(1.06%)</span></td>
+        <td>82.69%</td>
+        <td>55.86%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">22</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○ – デモサイト</a></td>
+        <td>109<br><span class="small">(1.01%)</span></td>
+        <td>100<br><span class="small">(1.2%)</span></td>
+        <td>00:01:13</td>
+        <td>41<br><span class="small">(0.83%)</span></td>
+        <td>82.93%</td>
+        <td>44.04%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">23</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○ – デモサイト</a></td>
+        <td>102<br><span class="small">(0.94%)</span></td>
+        <td>88<br><span class="small">(1.06%)</span></td>
+        <td>00:01:59</td>
+        <td>47<br><span class="small">(0.96%)</span></td>
+        <td>80.85%</td>
+        <td>46.08%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">24</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○○○○○○○○○○○ – デモサイト</a></td>
+        <td>101<br><span class="small">(0.93%)</span></td>
+        <td>82<br><span class="small">(0.99%)</span></td>
+        <td>00:01:45</td>
+        <td>32<br><span class="small">(0.65%)</span></td>
+        <td>75%</td>
+        <td>39.6%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">25</td>
+        <td class="title-col"><a href="#" target="_blank">○○○○○○○○○○○○○○○○○○○○○○○○○○ – デモサイト</a></td>
+        <td>88<br><span class="small">(0.81%)</span></td>
+        <td>77<br><span class="small">(0.93%)</span></td>
+        <td>00:04:33</td>
+        <td>63<br><span class="small">(1.28%)</span></td>
+        <td>87.3%</td>
+        <td>71.59%</td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr></tbody></table></section><section id="referrals">
+    <div class="title">
+<h2>5. 参照元サイト</h2><p>デモサイト</p>    </div>
+<p><time datetime="2022-06-01">2022/06/01</time> - <time datetime="2022-06-30">2022/06/30</time></p><section class="mainChart">
+    <canvas id="referralsUsersChart"></canvas>
+    <script>
+    var ctx = document.getElementById("referralsUsersChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["6\u67081\u65e5","6\u67082\u65e5","6\u67083\u65e5","6\u67084\u65e5","6\u67085\u65e5","6\u67086\u65e5","6\u67087\u65e5","6\u67088\u65e5","6\u67089\u65e5","6\u670810\u65e5","6\u670811\u65e5","6\u670812\u65e5","6\u670813\u65e5","6\u670814\u65e5","6\u670815\u65e5","6\u670816\u65e5","6\u670817\u65e5","6\u670818\u65e5","6\u670819\u65e5","6\u670820\u65e5","6\u670821\u65e5","6\u670822\u65e5","6\u670823\u65e5","6\u670824\u65e5","6\u670825\u65e5","6\u670826\u65e5","6\u670827\u65e5","6\u670828\u65e5","6\u670829\u65e5","6\u670830\u65e5"],
+            datasets: [
+                {
+                    label: 'ユーザー',
+                    data: ["115","148","123","131","126","152","134","140","133","139","171","123","136","134","281","168","139","107","114","123","127","141","141","125","87","119","174","447","129","115"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc7",
+                    pointBackgroundColor: "#068dc7"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                align: 'start'
+            }
+        }
+    });
+    </script>
+</section><table>
+    <colgroup>
+        <col span="2">
+        <col class="active">
+        <col span="8">
+    </colgroup>
+    <thead>
+        <tr>
+            <th colspan="2" rowspan="2">参照元</th>
+            <th colspan="3">集客</th>
+            <th colspan="3">行動</th>
+            <th colspan="3">コンバージョン<wbr>（すべての目標）</th>
+        </tr>
+        <tr>
+            <th>ユーザー</th>
+            <th>新規<wbr>ユーザー</th>
+            <th>セッション</th>
+            <th>直帰率</th>
+            <th>ページ/<wbr>セッション</th>
+            <th>平均<wbr>セッション<wbr>時間</th>
+            <th>コンバージョン<wbr>率</th>
+            <th>目標の<wbr>完了数</th>
+            <th>目標値</th>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td>4,087<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(4,087)</span></td>
+            <td>3,835<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(3,835)</span></td>
+            <td>4,912<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(4,912)</span></td>
+            <td>68.93%<br><span class="small">ビューの<wbr>平均：<br>68.93%<br>(0%)</span></td>
+            <td>2.2<br><span class="small">ビューの<wbr>平均：<br>2.2<br>(0%)</span></td>
+            <td>00:01:39<br><span class="small">ビューの<wbr>平均：<br>00:01:39<br>(0%)</span></td>
+            <td>0%<br><span class="small">ビューの<wbr>平均：<br>0%<br>(0%)</span></td>
+            <td>0<br><span class="small">全体に<wbr>対する<wbr>割合：<br>0%<br>(0)</span></td>
+            <td>$0<br><span class="small">全体に<wbr>対する<wbr>割合：<br>0%<br>($0)</span></td>
+        </tr>
+    </thead>
+    <tbody>    <tr>
+        <td class="rank">1</td>
+        <td class="title-col">google</td>
+        <td>1,744<br><span class="small">(42.67%)</span></td>
+        <td>1,644<br><span class="small">(42.87%)</span></td>
+        <td>2,096<br><span class="small">(42.67%)</span></td>
+        <td>67.75%</td>
+        <td>2.29</td>
+        <td>00:01:43</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">2</td>
+        <td class="title-col">(direct)</td>
+        <td>1,111<br><span class="small">(27.18%)</span></td>
+        <td>1,075<br><span class="small">(28.03%)</span></td>
+        <td>1,345<br><span class="small">(27.38%)</span></td>
+        <td>80.59%</td>
+        <td>1.53</td>
+        <td>00:01:01</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">3</td>
+        <td class="title-col">yahoo</td>
+        <td>695<br><span class="small">(17.01%)</span></td>
+        <td>653<br><span class="small">(17.03%)</span></td>
+        <td>802<br><span class="small">(16.33%)</span></td>
+        <td>69.2%</td>
+        <td>2.44</td>
+        <td>00:01:54</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">4</td>
+        <td class="title-col">bing</td>
+        <td>181<br><span class="small">(4.43%)</span></td>
+        <td>162<br><span class="small">(4.22%)</span></td>
+        <td>216<br><span class="small">(4.4%)</span></td>
+        <td>53.24%</td>
+        <td>2.82</td>
+        <td>00:02:06</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">5</td>
+        <td class="title-col">*******.org</td>
+        <td>100<br><span class="small">(2.45%)</span></td>
+        <td>88<br><span class="small">(2.29%)</span></td>
+        <td>120<br><span class="small">(2.44%)</span></td>
+        <td>35%</td>
+        <td>3.12</td>
+        <td>00:02:10</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">6</td>
+        <td class="title-col">t.co</td>
+        <td>43<br><span class="small">(1.05%)</span></td>
+        <td>38<br><span class="small">(0.99%)</span></td>
+        <td>82<br><span class="small">(1.67%)</span></td>
+        <td>35.37%</td>
+        <td>3.93</td>
+        <td>00:05:45</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">7</td>
+        <td class="title-col">classroom.google.com</td>
+        <td>21<br><span class="small">(0.51%)</span></td>
+        <td>18<br><span class="small">(0.47%)</span></td>
+        <td>31<br><span class="small">(0.63%)</span></td>
+        <td>29.03%</td>
+        <td>5.23</td>
+        <td>00:03:17</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">8</td>
+        <td class="title-col">service.smt.docomo.ne.jp</td>
+        <td>21<br><span class="small">(0.51%)</span></td>
+        <td>20<br><span class="small">(0.52%)</span></td>
+        <td>30<br><span class="small">(0.61%)</span></td>
+        <td>60%</td>
+        <td>2.37</td>
+        <td>00:01:49</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">9</td>
+        <td class="title-col">********.com</td>
+        <td>16<br><span class="small">(0.39%)</span></td>
+        <td>15<br><span class="small">(0.39%)</span></td>
+        <td>18<br><span class="small">(0.37%)</span></td>
+        <td>55.56%</td>
+        <td>2.28</td>
+        <td>00:01:25</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">10</td>
+        <td class="title-col">**********************.net</td>
+        <td>15<br><span class="small">(0.37%)</span></td>
+        <td>10<br><span class="small">(0.26%)</span></td>
+        <td>16<br><span class="small">(0.33%)</span></td>
+        <td>50%</td>
+        <td>3.44</td>
+        <td>00:02:49</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">11</td>
+        <td class="title-col">*******.com</td>
+        <td>12<br><span class="small">(0.29%)</span></td>
+        <td>12<br><span class="small">(0.31%)</span></td>
+        <td>12<br><span class="small">(0.24%)</span></td>
+        <td>75%</td>
+        <td>1.33</td>
+        <td>00:00:11</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">12</td>
+        <td class="title-col">*******.jp</td>
+        <td>12<br><span class="small">(0.29%)</span></td>
+        <td>11<br><span class="small">(0.29%)</span></td>
+        <td>12<br><span class="small">(0.24%)</span></td>
+        <td>75%</td>
+        <td>1.67</td>
+        <td>00:00:06</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">13</td>
+        <td class="title-col">ja.m.wikipedia.org</td>
+        <td>9<br><span class="small">(0.22%)</span></td>
+        <td>9<br><span class="small">(0.23%)</span></td>
+        <td>10<br><span class="small">(0.2%)</span></td>
+        <td>60%</td>
+        <td>1.5</td>
+        <td>00:00:11</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">14</td>
+        <td class="title-col">***********.com</td>
+        <td>9<br><span class="small">(0.22%)</span></td>
+        <td>3<br><span class="small">(0.08%)</span></td>
+        <td>10<br><span class="small">(0.2%)</span></td>
+        <td>60%</td>
+        <td>1.4</td>
+        <td>00:00:03</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">15</td>
+        <td class="title-col">ja.wikipedia.org</td>
+        <td>8<br><span class="small">(0.2%)</span></td>
+        <td>6<br><span class="small">(0.16%)</span></td>
+        <td>8<br><span class="small">(0.16%)</span></td>
+        <td>25%</td>
+        <td>3.5</td>
+        <td>00:01:03</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">16</td>
+        <td class="title-col">m.facebook.com</td>
+        <td>7<br><span class="small">(0.17%)</span></td>
+        <td>7<br><span class="small">(0.18%)</span></td>
+        <td>7<br><span class="small">(0.14%)</span></td>
+        <td>42.86%</td>
+        <td>1.86</td>
+        <td>00:00:26</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">17</td>
+        <td class="title-col">*************.co.jp</td>
+        <td>7<br><span class="small">(0.17%)</span></td>
+        <td>6<br><span class="small">(0.16%)</span></td>
+        <td>7<br><span class="small">(0.14%)</span></td>
+        <td>14.29%</td>
+        <td>9.43</td>
+        <td>00:08:28</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">18</td>
+        <td class="title-col">duckduckgo</td>
+        <td>6<br><span class="small">(0.15%)</span></td>
+        <td>5<br><span class="small">(0.13%)</span></td>
+        <td>7<br><span class="small">(0.14%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">19</td>
+        <td class="title-col">sp-web.search.auone.jp</td>
+        <td>6<br><span class="small">(0.15%)</span></td>
+        <td>5<br><span class="small">(0.13%)</span></td>
+        <td>7<br><span class="small">(0.14%)</span></td>
+        <td>71.43%</td>
+        <td>2.14</td>
+        <td>00:04:20</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">20</td>
+        <td class="title-col">*********.com</td>
+        <td>4<br><span class="small">(0.1%)</span></td>
+        <td>4<br><span class="small">(0.1%)</span></td>
+        <td>9<br><span class="small">(0.18%)</span></td>
+        <td>66.67%</td>
+        <td>3.11</td>
+        <td>00:00:48</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">21</td>
+        <td class="title-col">websearch.rakuten.co.jp</td>
+        <td>4<br><span class="small">(0.1%)</span></td>
+        <td>4<br><span class="small">(0.1%)</span></td>
+        <td>4<br><span class="small">(0.08%)</span></td>
+        <td>50%</td>
+        <td>2.25</td>
+        <td>00:02:27</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">22</td>
+        <td class="title-col">************.jp</td>
+        <td>3<br><span class="small">(0.07%)</span></td>
+        <td>3<br><span class="small">(0.08%)</span></td>
+        <td>3<br><span class="small">(0.06%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">23</td>
+        <td class="title-col">biglobe</td>
+        <td>3<br><span class="small">(0.07%)</span></td>
+        <td>3<br><span class="small">(0.08%)</span></td>
+        <td>3<br><span class="small">(0.06%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">24</td>
+        <td class="title-col">***********.com</td>
+        <td>3<br><span class="small">(0.07%)</span></td>
+        <td>2<br><span class="small">(0.05%)</span></td>
+        <td>3<br><span class="small">(0.06%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">25</td>
+        <td class="title-col">******.org</td>
+        <td>3<br><span class="small">(0.07%)</span></td>
+        <td>3<br><span class="small">(0.08%)</span></td>
+        <td>3<br><span class="small">(0.06%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr></tbody></table></section><section id="geo">
+    <div class="title">
+<h2>6. 地域</h2><p>デモサイト</p>    </div>
+<p><time datetime="2022-06-01">2022/06/01</time> - <time datetime="2022-06-30">2022/06/30</time></p><section class="mainChart">
+    <canvas id="geoUsersChart"></canvas>
+    <script>
+    var ctx = document.getElementById("geoUsersChart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["6\u67081\u65e5","6\u67082\u65e5","6\u67083\u65e5","6\u67084\u65e5","6\u67085\u65e5","6\u67086\u65e5","6\u67087\u65e5","6\u67088\u65e5","6\u67089\u65e5","6\u670810\u65e5","6\u670811\u65e5","6\u670812\u65e5","6\u670813\u65e5","6\u670814\u65e5","6\u670815\u65e5","6\u670816\u65e5","6\u670817\u65e5","6\u670818\u65e5","6\u670819\u65e5","6\u670820\u65e5","6\u670821\u65e5","6\u670822\u65e5","6\u670823\u65e5","6\u670824\u65e5","6\u670825\u65e5","6\u670826\u65e5","6\u670827\u65e5","6\u670828\u65e5","6\u670829\u65e5","6\u670830\u65e5"],
+            datasets: [
+                {
+                    label: 'ユーザー',
+                    data: ["115","148","123","131","126","152","134","140","133","139","171","123","136","134","281","168","139","107","114","123","127","141","141","125","87","119","174","447","129","115"],
+                    borderColor: "#068dc7",
+                    backgroundColor: "#068dc722",
+                    pointBorderColor: "#068dc7",
+                    pointBackgroundColor: "#068dc7"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                align: 'start'
+            }
+        }
+    });
+    </script>
+</section><table>
+    <colgroup>
+        <col span="2">
+        <col class="active">
+        <col span="8">
+    </colgroup>
+    <thead>
+        <tr>
+            <th colspan="2" rowspan="2">市区町村</th>
+            <th colspan="3">集客</th>
+            <th colspan="3">行動</th>
+            <th colspan="3">コンバージョン<wbr>（すべての目標）</th>
+        </tr>
+        <tr>
+            <th>ユーザー</th>
+            <th>新規<wbr>ユーザー</th>
+            <th>セッション</th>
+            <th>直帰率</th>
+            <th>ページ/<wbr>セッション</th>
+            <th>平均<wbr>セッション<wbr>時間</th>
+            <th>コンバージョン<wbr>率</th>
+            <th>目標の<wbr>完了数</th>
+            <th>目標値</th>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td>4,107<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(4,107)</span></td>
+            <td>3,835<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(3,835)</span></td>
+            <td>4,912<br><span class="small">全体に<wbr>対する<wbr>割合：<br>100%<br>(4,912)</span></td>
+            <td>68.93%<br><span class="small">ビューの<wbr>平均：<br>68.93%<br>(0%)</span></td>
+            <td>2.2<br><span class="small">ビューの<wbr>平均：<br>2.2<br>(0%)</span></td>
+            <td>00:01:39<br><span class="small">ビューの<wbr>平均：<br>00:01:39<br>(0%)</span></td>
+            <td>0%<br><span class="small">ビューの<wbr>平均：<br>0%<br>(0%)</span></td>
+            <td>0<br><span class="small">全体に<wbr>対する<wbr>割合：<br>0%<br>(0)</span></td>
+            <td>$0<br><span class="small">全体に<wbr>対する<wbr>割合：<br>0%<br>($0)</span></td>
+        </tr>
+    </thead>
+    <tbody>    <tr>
+        <td class="rank">1</td>
+        <td>(not set)</td>
+        <td>947<br><span class="small">(23.06%)</span></td>
+        <td>896<br><span class="small">(23.36%)</span></td>
+        <td>1,080<br><span class="small">(21.99%)</span></td>
+        <td>74.72%</td>
+        <td>1.79</td>
+        <td>00:01:05</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">2</td>
+        <td>Shibuya City</td>
+        <td>317<br><span class="small">(7.72%)</span></td>
+        <td>298<br><span class="small">(7.77%)</span></td>
+        <td>376<br><span class="small">(7.65%)</span></td>
+        <td>71.81%</td>
+        <td>1.8</td>
+        <td>00:01:10</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">3</td>
+        <td>Osaka</td>
+        <td>225<br><span class="small">(5.48%)</span></td>
+        <td>200<br><span class="small">(5.22%)</span></td>
+        <td>308<br><span class="small">(6.27%)</span></td>
+        <td>65.26%</td>
+        <td>2.41</td>
+        <td>00:01:13</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">4</td>
+        <td>Nagoya</td>
+        <td>205<br><span class="small">(4.99%)</span></td>
+        <td>192<br><span class="small">(5.01%)</span></td>
+        <td>232<br><span class="small">(4.72%)</span></td>
+        <td>64.22%</td>
+        <td>2.32</td>
+        <td>00:01:45</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">5</td>
+        <td>Nagano</td>
+        <td>153<br><span class="small">(3.73%)</span></td>
+        <td>135<br><span class="small">(3.52%)</span></td>
+        <td>314<br><span class="small">(6.39%)</span></td>
+        <td>55.1%</td>
+        <td>3</td>
+        <td>00:04:52</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">6</td>
+        <td>Shinjuku City</td>
+        <td>142<br><span class="small">(3.46%)</span></td>
+        <td>138<br><span class="small">(3.6%)</span></td>
+        <td>157<br><span class="small">(3.2%)</span></td>
+        <td>82.8%</td>
+        <td>1.59</td>
+        <td>00:00:57</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">7</td>
+        <td>Iida</td>
+        <td>115<br><span class="small">(2.8%)</span></td>
+        <td>96<br><span class="small">(2.5%)</span></td>
+        <td>180<br><span class="small">(3.66%)</span></td>
+        <td>64.44%</td>
+        <td>2.64</td>
+        <td>00:01:36</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">8</td>
+        <td>Yokohama</td>
+        <td>99<br><span class="small">(2.41%)</span></td>
+        <td>96<br><span class="small">(2.5%)</span></td>
+        <td>109<br><span class="small">(2.22%)</span></td>
+        <td>75.23%</td>
+        <td>1.83</td>
+        <td>00:01:14</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">9</td>
+        <td>Hamamatsu</td>
+        <td>66<br><span class="small">(1.61%)</span></td>
+        <td>63<br><span class="small">(1.64%)</span></td>
+        <td>79<br><span class="small">(1.61%)</span></td>
+        <td>59.49%</td>
+        <td>2.46</td>
+        <td>00:02:16</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">10</td>
+        <td>Washington</td>
+        <td>58<br><span class="small">(1.41%)</span></td>
+        <td>58<br><span class="small">(1.51%)</span></td>
+        <td>58<br><span class="small">(1.18%)</span></td>
+        <td>100%</td>
+        <td>1</td>
+        <td>00:00:00</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">11</td>
+        <td>Chiyoda City</td>
+        <td>53<br><span class="small">(1.29%)</span></td>
+        <td>50<br><span class="small">(1.3%)</span></td>
+        <td>61<br><span class="small">(1.24%)</span></td>
+        <td>85.25%</td>
+        <td>1.26</td>
+        <td>00:00:42</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">12</td>
+        <td>Minato City</td>
+        <td>43<br><span class="small">(1.05%)</span></td>
+        <td>38<br><span class="small">(0.99%)</span></td>
+        <td>47<br><span class="small">(0.96%)</span></td>
+        <td>55.32%</td>
+        <td>2.43</td>
+        <td>00:01:55</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">13</td>
+        <td>Matsumoto</td>
+        <td>42<br><span class="small">(1.02%)</span></td>
+        <td>37<br><span class="small">(0.96%)</span></td>
+        <td>43<br><span class="small">(0.88%)</span></td>
+        <td>58.14%</td>
+        <td>2.67</td>
+        <td>00:00:45</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">14</td>
+        <td>Sapporo</td>
+        <td>40<br><span class="small">(0.97%)</span></td>
+        <td>37<br><span class="small">(0.96%)</span></td>
+        <td>46<br><span class="small">(0.94%)</span></td>
+        <td>65.22%</td>
+        <td>2.15</td>
+        <td>00:02:01</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">15</td>
+        <td>Kyoto</td>
+        <td>39<br><span class="small">(0.95%)</span></td>
+        <td>35<br><span class="small">(0.91%)</span></td>
+        <td>46<br><span class="small">(0.94%)</span></td>
+        <td>65.22%</td>
+        <td>2.33</td>
+        <td>00:01:04</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">16</td>
+        <td>Fukuoka</td>
+        <td>34<br><span class="small">(0.83%)</span></td>
+        <td>32<br><span class="small">(0.83%)</span></td>
+        <td>37<br><span class="small">(0.75%)</span></td>
+        <td>72.97%</td>
+        <td>3.38</td>
+        <td>00:01:27</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">17</td>
+        <td>Kobe</td>
+        <td>34<br><span class="small">(0.83%)</span></td>
+        <td>31<br><span class="small">(0.81%)</span></td>
+        <td>38<br><span class="small">(0.77%)</span></td>
+        <td>65.79%</td>
+        <td>4.16</td>
+        <td>00:02:29</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">18</td>
+        <td>Setagaya City</td>
+        <td>33<br><span class="small">(0.8%)</span></td>
+        <td>31<br><span class="small">(0.81%)</span></td>
+        <td>36<br><span class="small">(0.73%)</span></td>
+        <td>77.78%</td>
+        <td>1.64</td>
+        <td>00:00:47</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">19</td>
+        <td>Saitama</td>
+        <td>31<br><span class="small">(0.75%)</span></td>
+        <td>30<br><span class="small">(0.78%)</span></td>
+        <td>34<br><span class="small">(0.69%)</span></td>
+        <td>70.59%</td>
+        <td>1.79</td>
+        <td>00:01:35</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">20</td>
+        <td>Yokkaichi</td>
+        <td>27<br><span class="small">(0.66%)</span></td>
+        <td>27<br><span class="small">(0.7%)</span></td>
+        <td>31<br><span class="small">(0.63%)</span></td>
+        <td>35.48%</td>
+        <td>13.55</td>
+        <td>00:10:32</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">21</td>
+        <td>Fukuyama</td>
+        <td>26<br><span class="small">(0.63%)</span></td>
+        <td>26<br><span class="small">(0.68%)</span></td>
+        <td>52<br><span class="small">(1.06%)</span></td>
+        <td>44.23%</td>
+        <td>4.83</td>
+        <td>00:04:25</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">22</td>
+        <td>Kawasaki</td>
+        <td>26<br><span class="small">(0.63%)</span></td>
+        <td>24<br><span class="small">(0.63%)</span></td>
+        <td>35<br><span class="small">(0.71%)</span></td>
+        <td>65.71%</td>
+        <td>2.23</td>
+        <td>00:02:14</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">23</td>
+        <td>Otsu</td>
+        <td>25<br><span class="small">(0.61%)</span></td>
+        <td>23<br><span class="small">(0.6%)</span></td>
+        <td>29<br><span class="small">(0.59%)</span></td>
+        <td>58.62%</td>
+        <td>3.31</td>
+        <td>00:02:08</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">24</td>
+        <td>Sendai</td>
+        <td>24<br><span class="small">(0.58%)</span></td>
+        <td>23<br><span class="small">(0.6%)</span></td>
+        <td>26<br><span class="small">(0.53%)</span></td>
+        <td>46.15%</td>
+        <td>2.46</td>
+        <td>00:01:43</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr>    <tr>
+        <td class="rank">25</td>
+        <td>Sakai</td>
+        <td>23<br><span class="small">(0.56%)</span></td>
+        <td>20<br><span class="small">(0.52%)</span></td>
+        <td>28<br><span class="small">(0.57%)</span></td>
+        <td>42.86%</td>
+        <td>2.25</td>
+        <td>00:01:31</td>
+        <td>0%</td>
+        <td>0<br><span class="small">(0%)</span></td>
+        <td>$0<br><span class="small">(0%)</span></td>
+    </tr></tbody></table></section></main>
+<footer>
+    <div class="inner">
+        <p>ご不明な点やキーワードの変更、サイト修正のご相談などございましたら<br>お気軽にお問い合わせください。</p>
+<address><strong>シューゴマツザワ株式会社</strong><br>〒395-0051 長野県○○市○○○○<br>TEL:(○○○○)○○-○○○○ FAX:(○○○○)○○-○○○○<br>E-Mail:example@shugomatsuzawa.com<br>URL:https://shugomatsuzawa.com</address>    </div>
+    <small>Copyright &copy; 2022 Shugo Matsuzawa. All Rights Reserved.</small>
+</footer><aside id="legal-footer">
+    <p>
+        <a href="ThirdPartySoftwareLicense.txt" target="_blank" rel="noopener">サードパーティに関する通知 <i class="fas fa-external-link-alt" aria-label="新しいタブで開く"></i></a>&nbsp;|&nbsp;
+        <a href="https://github.com/shugomatsuzawa/Web-Analytics-Reporting-Tool" target="_blank" rel="noopener">アクセス解析レポート作成ツールについて <i class="fas fa-external-link-alt" aria-label="新しいタブで開く"></i></a>&nbsp;|&nbsp;
+        <small>バージョン 1.1.1 beta 1</small>
+    </p>
+</aside></body>
+</html>
